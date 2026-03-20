@@ -1,31 +1,157 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hello World</title>
-  <link href='/style.css' rel='stylesheet'>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StockInsight - AI-Powered Stock Analysis</title>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <h1>Hello, world!</h1>
-  <button onclick="console.log('hello');">Press me</button>
 
-  <div id="disqus_thread"></div>
-  <script>
-      var disqus_config = function () {
-          this.page.url = window.location.href;
-          this.page.identifier = window.location.pathname;
-      };
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <div class="logo">
+                <i class="fa-solid fa-chart-line"></i> StockInsight
+            </div>
+            <nav>
+                <a href="#features">Features</a>
+                <a href="#about">About</a>
+                <a href="#" class="btn-secondary">Login</a>
+            </nav>
+        </div>
+    </header>
 
-      (function() { // DON'T EDIT BELOW THIS LINE
-          var d = document, s = d.createElement('script');
-          s.src = 'https://appbuilder-1.disqus.com/embed.js';
-          s.setAttribute('data-timestamp', +new Date());
-          (d.head || d.body).appendChild(s);
-      })();
-  </script>
-  <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container hero-content">
+            <h1>Invest Smarter with AI Analysis</h1>
+            <p>Enter a US stock ticker to get instant financial health checks, technical momentum scores, and AI-driven investment insights.</p>
+            
+            <div class="search-box">
+                <input type="text" id="tickerInput" placeholder="Enter Ticker (e.g., AAPL, TSLA, NVDA)..." autocomplete="off">
+                <button id="searchBtn" class="btn-primary">
+                    <i class="fa-solid fa-magnifying-glass"></i> Analyze
+                </button>
+            </div>
+            <div class="error-message" id="errorMessage">Please enter a valid ticker symbol.</div>
+        </div>
+    </section>
 
-  <script defer type="text/javascript" src="/main.js"></script>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+        <div class="loading-text" id="loadingText">Connecting to market data...</div>
+    </div>
+
+    <!-- Results Section -->
+    <section id="resultsSection" class="results-section hidden">
+        <div class="container">
+            
+            <!-- Summary Header -->
+            <div class="stock-header">
+                <div>
+                    <h2 id="stockName">Apple Inc.</h2>
+                    <span class="ticker-badge" id="stockTicker">AAPL</span>
+                </div>
+                <div class="price-info">
+                    <div class="price" id="stockPrice">$178.35</div>
+                    <div class="change positive" id="stockChange">+1.25%</div>
+                </div>
+            </div>
+
+            <!-- Scores Grid -->
+            <div class="scores-grid">
+                <!-- AI Score -->
+                <div class="score-card ai-score">
+                    <h3>AI Investment Score</h3>
+                    <div class="gauge-container">
+                        <div class="gauge-value" id="aiScoreValue">87</div>
+                        <div class="gauge-label">Strong Buy</div>
+                    </div>
+                    <p>Based on weighted analysis of financials and momentum.</p>
+                </div>
+
+                <!-- Financial Health -->
+                <div class="score-card">
+                    <h3>Financial Health</h3>
+                    <div class="progress-bar">
+                        <div class="progress" id="financialScoreBar" style="width: 0%"></div>
+                    </div>
+                    <span class="score-text" id="financialScoreText">0/100</span>
+                    <ul class="key-metrics">
+                        <li><span>Revenue Growth</span> <span class="metric-val" id="revenueMetric">High</span></li>
+                        <li><span>Profit Margin</span> <span class="metric-val" id="marginMetric">Healthy</span></li>
+                        <li><span>Debt Level</span> <span class="metric-val" id="debtMetric">Low</span></li>
+                    </ul>
+                </div>
+
+                <!-- Technical Momentum -->
+                <div class="score-card">
+                    <h3>Technical Momentum</h3>
+                    <div class="progress-bar">
+                        <div class="progress" id="technicalScoreBar" style="width: 0%"></div>
+                    </div>
+                    <span class="score-text" id="technicalScoreText">0/100</span>
+                    <ul class="key-metrics">
+                        <li><span>RSI (14)</span> <span class="metric-val" id="rsiMetric">Neutral</span></li>
+                        <li><span>MACD</span> <span class="metric-val" id="macdMetric">Bullish</span></li>
+                        <li><span>Trend</span> <span class="metric-val" id="trendMetric">Upward</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-container">
+                <div class="chart-box">
+                    <h3>Price History (1 Year)</h3>
+                    <canvas id="priceChart"></canvas>
+                </div>
+                <div class="chart-box">
+                    <h3>Revenue & Earnings</h3>
+                    <canvas id="financialChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Analysis Text -->
+            <div class="analysis-summary">
+                <h3><i class="fa-solid fa-robot"></i> AI Analyst Verdict</h3>
+                <p id="analysisText">
+                    Loading analysis...
+                </p>
+            </div>
+
+            <!-- Email Capture -->
+            <div class="email-capture">
+                <h3>Get the Full Comprehensive Report</h3>
+                <p>Detailed breakdown of risks, competitors, and 5-year forecasts delivered to your inbox.</p>
+                <form id="emailForm" class="email-form">
+                    <input type="email" id="userEmail" placeholder="Enter your email address" required>
+                    <button type="submit" class="btn-primary">Send Report</button>
+                </form>
+                <div id="emailSuccess" class="success-message hidden">
+                    <i class="fa-solid fa-check-circle"></i> Report sent successfully! Check your inbox.
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container footer-content">
+            <p>&copy; 2026 StockInsight. All rights reserved.</p>
+            <p class="disclaimer">Disclaimer: This is a demo application. Financial data is simulated for demonstration purposes and should not be used for actual investment decisions.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/analyzer.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>
